@@ -1,0 +1,72 @@
+---
+title: "project"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+
+### Предмет исследования: Тонально окрашенные глаголы русского языка из словаря оценочных фреймов RuSentiFrames.
+### Методика сбора данных: Глаголы были размечены на наличие/отсутствие тональности пятью респондентами.
+
+### Те глаголы, которые один и более респондентов отметили, как тонально окрашенные, были извлечены в отдельную таблицу, и размечены на позитив/негатив.
+
+### Так же был проведен эксперимент с предобученными моделями Fasttext, взятыми с ресурса RusVectores. Были выбраны сидовые множества из сильно тонально окрашенных глаголов(позитивное и негативное), и с помощью модели были измеренны косинусные расстояния до этих множеств, для каждого из глаголов. 
+### Глаголы, более близкие к позитивному множеству были оценены, как позитивные, и более близкие к негативному - как негативные.
+
+
+### Целью исследования является оценка результата работы модели, и наличия связи между оценкой разметчиков и оценкой модели на позитив негатив, и наличия зависимости количества совпадений между этими оценками от коэффициента тональности, если принять его равным кол-ву человек, которые сочли глагол тональным(данные из разметки глаголов на наличие отсутствие тональности в целом), а косинусную близость до сидового множества считать коэффициентом тональности, который присвоила глаголу модель. 
+
+
+### Гипотеза состоит в том, что связь между оценкой тональности, присвоенной разметчиками, и оценкой тональности и полярности при помощи модели есть.
+### Еще одна гипотеза состоит в том, что негативные глаголы более тонально окрашены, чем позитивные.
+
+
+```{r setup, include=FALSE}
+#install.packages("tidyverse")
+library(tidyverse)
+#install.packages('lsr')
+#library(lsr)
+#install.packages('vcd')
+#library(vcd)
+```
+
+### Данные - разметка на наличие отсутствие тональности.
+
+```{r 1.0}
+tonality_grisha <- read.csv("https://raw.githubusercontent.com/DmitryKutsev/NIS_SentiFrame/master/annotations/annotation_arshinov.csv")
+tonality_masha <- read.csv("https://raw.githubusercontent.com/DmitryKutsev/NIS_SentiFrame/master/annotations/annotation_masha.csv")
+tonality_ira <- read.csv("https://raw.githubusercontent.com/DmitryKutsev/NIS_SentiFrame/master/annotations/annotation_ira.csv")
+tonality_olya <- read.csv("https://raw.githubusercontent.com/DmitryKutsev/NIS_SentiFrame/master/annotations/annotation_olya.csv")   
+tonality_lesha <- read.csv("https://raw.githubusercontent.com/DmitryKutsev/NIS_SentiFrame/master/annotations/annotation_lesha.csv")
+head(tonality_olya) 
+
+```
+
+### Отобранные глаголы, размеченные на позитив/негатив.
+
+
+```{r 1.1}
+polar_dima <- read.csv("https://raw.githubusercontent.com/DmitryKutsev/NIS_SentiFrame/master/annotations/polarity_annotation/polar_annotation_dima.csv")
+
+polar_ira <- read.csv("https://raw.githubusercontent.com/DmitryKutsev/NIS_SentiFrame/master/annotations/polarity_annotation/polar_annotation_ira.csv")
+
+polar_masha <- read.csv("https://raw.githubusercontent.com/DmitryKutsev/NIS_SentiFrame/master/annotations/polarity_annotation/polar_annotation_masha.csv")
+head(polar_dima)
+```
+
+
+### Данные - ручная разметка на полярность тональности, плюс определение полярности тональности с помощью модели fasttext.
+### manual_tonality - сумма голосов, присвоенных разметчиками глаголу(от 1 до 5), разделенная на кол-во разметчиков.
+### fasttext_tonality - косинусное растояние до наиболее близкого сидового множества
+### manual_polarity и fasttext_polarity - полярности(позитив/негатив), присвоенные разметчиками и моделью.
+
+```{r 1.2}
+model_manual_df <- read.csv("https://raw.githubusercontent.com/DmitryKutsev/NIS_SentiFrame/master/annotations/polarity_annotation/my_full_df.csv")
+head(model_manual_df)
+
+```
+
+
+
